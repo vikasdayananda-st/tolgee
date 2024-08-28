@@ -122,7 +122,18 @@ export const TranslationsHeader = () => {
               params={{ count: String(translationsTotal) }}
             />
           </Typography>
-          <button onClick={handleTranslateAll}>AI Translate</button>
+          <button
+            style={{
+              background: 'transparent',
+              color: '#f86793',
+              border: '1px solid #f86793',
+              borderRadius: '3px',
+              fontWeight: 'bold',
+            }}
+            onClick={handleTranslateAll}
+          >
+            🤖 AI Translate
+          </button>
         </StyledResultCount>
       ) : null}
       {dataReady && newCreateDialog === 'true' && (
