@@ -67,6 +67,7 @@ export const TranslationsHeader = () => {
 
   const selection = useTranslationsSelector((c) => c.selection);
   const translations = useTranslationsSelector((c) => c.translations);
+  const languages = useTranslationsSelector((c) => c.languages);
   const selectedLocales =
     translations?.filter((locale) => selection.includes(locale.keyId)) || [];
   const selectedLocalesKeyAndText = selectedLocales.map((locale) => ({
@@ -76,20 +77,27 @@ export const TranslationsHeader = () => {
 
   const { updateTranslation } = useTranslationsActions();
 
-  const handleTranslateAll = async () => {
+  const translateAll = async (languageTag: string) => {
     const translatedLocales = await fetchTranslationMultiple({
-      queryKey: ['multiple', 'de', selectedLocalesKeyAndText],
+      queryKey: ['multiple', languageTag, selectedLocalesKeyAndText],
     });
     selectedLocales.forEach((locale) => {
       updateTranslation({
         keyId: locale.keyId,
-        lang: 'de',
+        lang: languageTag,
         data: {
           auto: false,
           text: translatedLocales.find((f) => f.keyId === locale.keyId).text,
         },
       });
     });
+  };
+
+  const handleTranslateAll = async () => {
+    if (!languages) return;
+    for (const language of languages) {
+      await translateAll(language.tag);
+    }
   };
 
   return (
