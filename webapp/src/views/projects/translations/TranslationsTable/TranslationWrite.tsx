@@ -14,7 +14,7 @@ import { useMissingPlaceholders } from '../cell/useMissingPlaceholders';
 import { TranslationVisual } from '../translationVisual/TranslationVisual';
 import { ControlsEditorReadOnly } from '../cell/ControlsEditorReadOnly';
 import { useBaseTranslation } from '../useBaseTranslation';
-import {translateStrings} from "tg.hooks/useTranslate";
+import { translateStrings } from 'tg.hooks/useTranslate';
 
 const StyledContainer = styled('div')`
   display: grid;
@@ -45,7 +45,7 @@ type Props = {
   tools: ReturnType<typeof useTranslationCell>;
 };
 
-const fetchHelloWorld = async ({ queryKey }) => {
+const fetchTranslation = async ({ queryKey }) => {
   const [, languageName, translationText] = queryKey;
 
   // Call the translateStrings function and return the result
@@ -54,12 +54,28 @@ const fetchHelloWorld = async ({ queryKey }) => {
 
   const response = await translateStrings({
     prompt,
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.7,
     team: 'staywise',
   });
 
   return response;
+};
+
+export const fetchTranslationMultiple = async ({ queryKey }) => {
+  const [, languageName, selectedLocalesKeyAndText] = queryKey;
+
+  // Call the translateStrings function and return the result
+  const prompt = `Translate the following strings to ${languageName} and provide the response as an array with a key "translatedText":
+  ${JSON.stringify(selectedLocalesKeyAndText, null, 2)}`;
+
+  const response = await translateStrings({
+    prompt,
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    team: 'staywise',
+  });
+  return response.translatedText;
 };
 
 export const TranslationWrite: React.FC<Props> = ({ tools }) => {
@@ -124,8 +140,8 @@ export const TranslationWrite: React.FC<Props> = ({ tools }) => {
   };
 
   const { refetch } = useQuery(
-    ['helloWorld', language.name, translation?.text],
-    fetchHelloWorld,
+    ['helloWorld', language.name, translation?.text || baseTranslation],
+    fetchTranslation,
     {
       enabled: false,
     }
@@ -134,7 +150,6 @@ export const TranslationWrite: React.FC<Props> = ({ tools }) => {
   const handleFetchAiTranslation = async () => {
     const data = await refetch();
     if (editorRef.current) {
-      console.log(data)
       const state = editorRef.current.state;
       const transaction = state.update({
         changes: {

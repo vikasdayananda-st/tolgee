@@ -4,7 +4,10 @@ import { T } from '@tolgee/react';
 import { useUrlSearchState } from 'tg.hooks/useUrlSearchState';
 import { useBottomPanel } from 'tg.component/bottomPanel/BottomPanelContext';
 
-import { useTranslationsSelector } from '../context/TranslationsContext';
+import {
+  useTranslationsActions,
+  useTranslationsSelector,
+} from '../context/TranslationsContext';
 import { KeyCreateDialog } from './KeyCreateDialog';
 import { TranslationControls } from './TranslationControls';
 import { TranslationControlsCompact } from './TranslationControlsCompact';
@@ -12,6 +15,7 @@ import { useState } from 'react';
 import { confirmation } from 'tg.hooks/confirmation';
 import { useGlobalContext } from 'tg.globalContext/GlobalContext';
 import { SelectAllCheckbox } from '../BatchOperations/SelectAllCheckbox';
+import { fetchTranslationMultiple } from '../TranslationsTable/TranslationWrite';
 
 const StyledResultCount = styled('div')`
   padding: 9px 0px 4px 0px;
@@ -61,6 +65,33 @@ export const TranslationsHeader = () => {
     }
   }
 
+  const selection = useTranslationsSelector((c) => c.selection);
+  const translations = useTranslationsSelector((c) => c.translations);
+  const selectedLocales =
+    translations?.filter((locale) => selection.includes(locale.keyId)) || [];
+  const selectedLocalesKeyAndText = selectedLocales.map((locale) => ({
+    keyId: locale.keyId,
+    text: locale.translations.en.text,
+  }));
+
+  const { updateTranslation } = useTranslationsActions();
+
+  const handleTranslateAll = async () => {
+    const translatedLocales = await fetchTranslationMultiple({
+      queryKey: ['multiple', 'de', selectedLocalesKeyAndText],
+    });
+    selectedLocales.forEach((locale) => {
+      updateTranslation({
+        keyId: locale.keyId,
+        lang: 'de',
+        data: {
+          auto: false,
+          text: translatedLocales.find((f) => f.keyId === locale.keyId).text,
+        },
+      });
+    });
+  };
+
   return (
     <>
       {isSmall ? (
@@ -81,6 +112,7 @@ export const TranslationsHeader = () => {
               params={{ count: String(translationsTotal) }}
             />
           </Typography>
+          <button onClick={handleTranslateAll}>AI Translate</button>
         </StyledResultCount>
       ) : null}
       {dataReady && newCreateDialog === 'true' && (

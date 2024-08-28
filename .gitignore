@@ -70,4 +70,4 @@ backend/app/src/main/resources/application-js-e2e.properties
 
 ngrok.yml
 ngrok.local.yml
-webapp/.env.development
+/webapp/.env.development

@@ -12,7 +12,7 @@ export const translateStrings = async ({
   team = 'staywise',
 }) => {
   // Get API key from environment variables
-  const apiKey = process.env.REACT_APP_API_KEY;
+  const apiKey = import.meta.env.VITE_APP_API_KEY;
 
   // Prepare the request payload
   const payload = {
@@ -32,7 +32,7 @@ export const translateStrings = async ({
   const responseData = response.data.response;
 
   // Assuming the API response contains a JSON-formatted string
-  return responseData;
+  return responseData
 };
 
 // React Query hook for translation
