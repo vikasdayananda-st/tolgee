@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2020. Tolgee
+ */
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'io.spring.dependency-management'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'org.springframework.boot' apply false
+    id "kotlin-allopen"
+    id "io.sentry.jvm.gradle"
+}
+
+group = 'io.tolgee'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: "org.jetbrains.kotlin.plugin.spring"
+apply plugin: "kotlin-allopen"
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+allOpen {
+    annotation("org.springframework.stereotype.Component")
+    annotation("org.springframework.boot.test.context.SpringBootTest")
+}
+
+dependencies {
+    implementation libs.kotlinCoroutines
+    implementation "org.springframework.boot:spring-boot-starter-hateoas"
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation "org.springframework.boot:spring-boot-starter-websocket"
+
+    implementation(project(':data'))
+    implementation(project(':misc'))
+    implementation(project(':security'))
+
+    /**
+     * SPRING DOC
+     */
+    implementation libs.springDocWebmvcApi
+    implementation libs.springDocOpenApiUi
+    implementation libs.redissonSpringBootStarter
+
+    /**
+     * Misc
+     */
+    implementation libs.commonsCodec
+    implementation libs.jjwtApi
+    implementation libs.jjwtImpl
+    implementation libs.jjwtJackson
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.5")
+    api libs.postHog
+    implementation libs.kotlinReflect
+    implementation libs.jacksonModuleKotlin
+
+    /**
+     * SLACK SDK
+     */
+    api libs.slackApiClient
+}
+
+sourceSets {
+    main.kotlin.srcDirs = ['src/main/kotlin', 'src/main/java']
+    test.kotlin.srcDirs = ['src/test/kotlin', 'src/test/java']
+}
+
+dependencyManagement {
+    applyMavenExclusions = false
+
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}

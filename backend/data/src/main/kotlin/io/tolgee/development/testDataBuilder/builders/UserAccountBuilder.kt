@@ -1,0 +1,40 @@
+package io.tolgee.development.testDataBuilder.builders
+
+import io.tolgee.development.testDataBuilder.FT
+import io.tolgee.development.testDataBuilder.builders.slack.SlackUserConnectionBuilder
+import io.tolgee.model.Pat
+import io.tolgee.model.UserAccount
+import io.tolgee.model.UserPreferences
+import io.tolgee.model.slackIntegration.SlackUserConnection
+import org.springframework.core.io.ClassPathResource
+
+class UserAccountBuilder(
+  val testDataBuilder: TestDataBuilder,
+) : BaseEntityDataBuilder<UserAccount, UserAccountBuilder>() {
+  var rawPassword = "admin"
+  override var self: UserAccount = UserAccount()
+  lateinit var defaultOrganizationBuilder: OrganizationBuilder
+
+  class DATA {
+    var avatarFile: ClassPathResource? = null
+    var userPreferences: UserPreferencesBuilder? = null
+    var pats: MutableList<PatBuilder> = mutableListOf()
+    var slackUserConnections: MutableList<SlackUserConnectionBuilder> = mutableListOf()
+  }
+
+  var data = DATA()
+
+  fun setAvatar(filePath: String) {
+    data.avatarFile = ClassPathResource(filePath, this.javaClass.classLoader)
+  }
+
+  fun setUserPreferences(ft: UserPreferences.() -> Unit) {
+    data.userPreferences =
+      UserPreferencesBuilder(this)
+        .also { ft(it.self) }
+  }
+
+  fun addPat(ft: FT<Pat>) = addOperation(data.pats, ft)
+
+  fun addSlackUserConnection(ft: FT<SlackUserConnection>) = addOperation(data.slackUserConnections, ft)
+}

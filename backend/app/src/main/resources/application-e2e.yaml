@@ -1,0 +1,77 @@
+spring:
+  jpa:
+    show-sql: true
+tolgee:
+  billing:
+    enabled: false
+  frontend-url: http://localhost:8081
+  authentication:
+    enabled: true
+    needs-email-verification: true
+    registrations-allowed: true
+    initial-password: "admin"
+    github:
+      client-id: dummy_client_id
+      client-secret: dummy_client_secret
+    oauth2:
+      client-id: dummy_client_id
+      client-secret: dummy_client_secret
+      scopes:
+        - openid
+        - email
+        - profile
+      authorization-url: "https://dummy-url.com/authorize"
+      token-url: "https://dummy-url.com/oauth/token"
+      user-url: "https://dummy-url.com/userinfo"
+    create-demo-for-initial-user: false
+  rate-limits: # tests go brrrr but then get 429'd and no longer go brrrr
+    global-limits: false
+    endpoint-limits: false
+    authentication-limits: false
+  file-storage-url: http://localhost:8201
+  internal:
+    controller-enabled: true
+    fake-github-login: true
+    fake-mt-providers: true
+  smtp:
+    host: localhost
+    port: 21025
+    ssl-enabled: false
+    auth: false
+    tls-enabled: false
+    tls-required: false
+    from: Tolgee <no-reply@tolgee.io>
+  cache:
+    enabled: true
+    use-redis: false
+    default-ttl: 120000
+    caffeine-max-size: 1000000
+  recaptcha:
+    site-key: 6Le0X08dAAAAALfQQk1NeWd-kXqvzLVk8HqoZpRw
+    secret-key: dummy_secret_key
+  content-delivery:  
+    public-url-prefix: https://cdndev.tolg.ee/i18n
+  machine-translation:
+    free-credits-amount: 1000000000
+    google:
+      api-key: mock
+    aws:
+      accessKey: mock
+      secretKey: mock
+  telemetry:
+    enabled: false
+  batch:
+    concurrency: 10
+  postgres-autostart:
+    container-name: tolgee-postgres-e2e
+    port: 58532
+server:
+  port: 8201
+  error:
+    include-exception: true
+    include-stacktrace: always
+logging:
+  level:
+    io.tolgee.service: TRACE
+    io.tolgee.controllers.internal.e2eData.OrganizationE2eDataController: TRACE
+    io.tolgee.controllers.internal.e2eData.ProjectsE2eDataController: TRACE
