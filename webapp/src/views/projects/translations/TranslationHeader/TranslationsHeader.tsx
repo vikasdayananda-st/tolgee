@@ -88,6 +88,7 @@ export const TranslationsHeader = () => {
         data: {
           auto: false,
           text: translatedLocales.find((f) => f.keyId === locale.keyId).text,
+          state: 'TRANSLATED',
         },
       });
     });
