@@ -16,6 +16,7 @@ type State = components['schemas']['TranslationViewModel']['state'];
 const StyledContainer = styled(Box)`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 `;
 
@@ -33,6 +34,7 @@ type ControlsProps = {
   onInsertBase?: () => void;
   onStateChange?: (state: StateInType) => void;
   onModeToggle?: () => void;
+  onFetchAiTranslation?: () => void;
   controlsProps?: React.ComponentProps<typeof Box>;
 };
 
@@ -44,6 +46,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
   onInsertBase,
   onModeToggle,
   onStateChange,
+  onFetchAiTranslation,
   controlsProps,
 }) => {
   const project = useProject();
@@ -63,6 +66,18 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
   return (
     <StyledContainer {...controlsProps}>
       <StyledIcons>
+        <ControlsButton
+          style={{
+            fontSize: '1.5rem',
+          }}
+          onClick={onFetchAiTranslation}
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+          tooltip="Translate with AI"
+        >
+          🤖
+        </ControlsButton>
         {displayTransitionButtons && (
           <StateTransitionButtons state={state} onStateChange={onStateChange} />
         )}

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { EditorView } from 'codemirror';
 import { styled } from '@mui/material';
 import { Placeholder } from '@tginternal/editor';
+import { useQuery } from 'react-query';
 
 import { ControlsEditorMain } from '../cell/ControlsEditorMain';
 import { ControlsEditorSmall } from '../cell/ControlsEditorSmall';
@@ -41,6 +42,17 @@ const StyledControls = styled('div')`
 
 type Props = {
   tools: ReturnType<typeof useTranslationCell>;
+};
+
+const fetchHelloWorld = async ({ queryKey }) => {
+  const [, languageName, translationText] = queryKey;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(
+        `English translation for ${languageName} text: ${translationText}`
+      );
+    }, 1000);
+  });
 };
 
 export const TranslationWrite: React.FC<Props> = ({ tools }) => {
@@ -104,6 +116,30 @@ export const TranslationWrite: React.FC<Props> = ({ tools }) => {
     }
   };
 
+  const { refetch } = useQuery(
+    ['helloWorld', language.name, translation?.text],
+    fetchHelloWorld,
+    {
+      enabled: false,
+    }
+  );
+
+  const handleFetchAiTranslation = async () => {
+    const data = await refetch();
+
+    if (editorRef.current) {
+      const state = editorRef.current.state;
+      const transaction = state.update({
+        changes: {
+          from: 0,
+          to: state.doc.length,
+          insert: data.data as string,
+        },
+      });
+      editorRef.current.dispatch(transaction);
+    }
+  };
+
   return (
     <StyledContainer>
       <StyledEditor onMouseDown={(e) => e.preventDefault()}>
@@ -142,6 +178,7 @@ export const TranslationWrite: React.FC<Props> = ({ tools }) => {
             onInsertBase={editEnabled ? handleInsertBase : undefined}
             onStateChange={setState}
             onModeToggle={editEnabled ? handleModeToggle : undefined}
+            onFetchAiTranslation={handleFetchAiTranslation}
           />
           {editEnabled ? (
             <ControlsEditorMain
