@@ -75,7 +75,7 @@ export const TranslationsHeader = () => {
     text: locale.translations.en.text,
   }));
 
-  const { updateTranslation } = useTranslationsActions();
+  const { updateTranslation, changeField } = useTranslationsActions();
 
   const translateAll = async (languageTag: string) => {
     const translatedLocales = await fetchTranslationMultiple({
@@ -100,6 +100,10 @@ export const TranslationsHeader = () => {
       translateAll(language.tag)
     );
     await Promise.all(translationPromises);
+    changeField({
+      after: undefined,
+      onSuccess: () => undefined,
+    });
   };
 
   return (
