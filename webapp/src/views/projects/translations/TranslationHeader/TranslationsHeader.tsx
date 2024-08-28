@@ -96,9 +96,10 @@ export const TranslationsHeader = () => {
 
   const handleTranslateAll = async () => {
     if (!languages) return;
-    for (const language of languages) {
-      await translateAll(language.tag);
-    }
+    const translationPromises = languages.map((language) =>
+      translateAll(language.tag)
+    );
+    await Promise.all(translationPromises);
   };
 
   return (
